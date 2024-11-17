@@ -6,22 +6,38 @@
 
 Storage::Storage(string filename)
 {   
+    string str_buf;
     this->storage_name = filename;
     this->fs.open(filename, ios::in);
     while(!fs.eof())
     {
         vector<string> tmp;
-        getline(this->fs,this->str_buf,'\n');
+        getline(this->fs, str_buf,'\n');
 
         int position;
         int cur_position = 0;
-        while((position = this->str_buf.find(",", cur_position)) != string::npos)
+        while((position = str_buf.find(",", cur_position)) != string::npos)
         {
             int len = position - cur_position;
             tmp.push_back(str_buf.substr(cur_position, len));
             cur_position = position + 1;
         }
         tmp.push_back(str_buf.substr(cur_position));
+        addLine(tmp);
+    }
+}
+
+Storage::Storage(const Storage &other)
+{
+    this->fs.open(this->storage_name);
+    this->storage_name = other.storage_name;
+    for(vector<string> v : other.database)
+    {
+        vector<string> tmp;
+        for(string data : v)
+        {
+            tmp.push_back(data);
+        }
         addLine(tmp);
     }
 }
@@ -43,12 +59,44 @@ Storage::~Storage()
     }
 }
 
+vector<string> Storage::getItem(string code) const
+{  
+    for(vector<string> v : this->database)
+    {
+        if(v[0] == code)
+        {
+            vector<string> result;
+            for(string data : v)
+            {
+                result.push_back(data);
+            }
+            return result;
+        }
+    }
+    cout << "Wrong item code" << endl;
+}
+
+vector<string> Storage::getItem(int line) const
+{
+    vector<string> tmp;
+    for(string data : this->database[line + 1]) // 목록부분을 제외하기 때문에 인덱스 값에 +1 을한다
+    {
+        tmp.push_back(data);
+    }
+    return tmp;
+}
+
+int Storage::size() const
+{
+    return this->database.size() - 1; // database의 목록부분을 제외한 사이즈
+}
+
 void Storage::addLine(vector<string> new_line)
 {
     this->database.push_back(new_line);
 }
 
-void Storage::removeCode(string code)
+void Storage::removeItem(string code)
 {
     for(int i = 0; i < this->database.size(); i++)
     {

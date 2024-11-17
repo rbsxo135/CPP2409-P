@@ -1,6 +1,6 @@
 code,name,stand,cur_stand_qnt,max_stand_qnt,inventory
-1000000,ShirimpSnack,Snack,3,5,10
-1000002,PotatochipOriginal,Snack,5,5,30
+1000000,ShirimpSnack,Snack,1,5,10
+1000002,PotatochipOriginal,Snack,3,5,30
 1000003,PotatochipOnion,Snack,5,5,7
 1000004,CornSnackSpicy,Snack,1,5,0
 1000005,CornSnackSweet,Snack,3,5,0
@@ -9,6 +9,6 @@ code,name,stand,cur_stand_qnt,max_stand_qnt,inventory
 3000002,ChickenChest,Refrigerated,6,12,0
 4000000,SweetSpicyCupnoodle,Cupnoodle,2,3,12
 4000001,SpicyChickenCupnoodle,Cupnoodle,3,3,8
-5000000,Sprite,Walkin,13,15,6
+5000000,Sprite,Walkin,9,15,6
 5000001,Pepci,Walkin,12,15,0
 5000002,PepciZeroLime,Walkin,7,15,0
