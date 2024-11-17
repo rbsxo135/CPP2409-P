@@ -6,17 +6,16 @@
 
 Storage::Storage(string filename)
 {   
-    fstream fs;
-    string str_buf;
-    fs.open(filename, ios::in);
+    this->storage_name = filename;
+    this->fs.open(filename, ios::in);
     while(!fs.eof())
     {
         vector<string> tmp;
-        getline(fs,str_buf,'\n');
+        getline(this->fs,this->str_buf,'\n');
 
         int position;
         int cur_position = 0;
-        while((position = str_buf.find(",", cur_position)) != string::npos)
+        while((position = this->str_buf.find(",", cur_position)) != string::npos)
         {
             int len = position - cur_position;
             tmp.push_back(str_buf.substr(cur_position, len));
@@ -24,6 +23,23 @@ Storage::Storage(string filename)
         }
         tmp.push_back(str_buf.substr(cur_position));
         addLine(tmp);
+    }
+}
+
+// 소멸하면서 데이터베이스의 내용을 같은 이름의 새로운 csv파일로 만들어 저장한다
+Storage::~Storage()
+{
+    ofstream outfile(this->storage_name);
+    for(int i = 0; i < this->database.size(); i++)
+    {
+        for(int j = 0; j < this->database[i].size(); j++)
+        {
+            outfile << this->database[i][j];
+            if(j != this->database[i].size() - 1)
+                outfile << ",";
+        }
+        if(i != this->database.size() - 1)
+            outfile << endl;
     }
 }
 

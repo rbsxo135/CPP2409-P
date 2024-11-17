@@ -7,9 +7,13 @@ using namespace std;
 // 데이터 저장공간 클래스
 class Storage{
 private:
+    fstream fs;
+    string str_buf;
+    string storage_name;
     vector<vector<string>> database; // 2차원 벡터를 활용한 동적 배열
 public:
     Storage(string filename);
+    ~Storage(); // 소멸시 변경된 내용을 저장하는 소멸자
     void addLine(vector<string> new_line); // database 행 추가
     void removeCode(string code); // code에 해당하는 제품 삭제
     void itemSold(string code, int qnt); // code에 해당하는 제품 판매

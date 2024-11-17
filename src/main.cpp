@@ -6,9 +6,6 @@ const int FRESH_FOOD_COLUMM = 7;
 
 int main(int argc, char** argv)
 {
-    string str_buf;
-    fstream fs;
-
     // 기능 테스트
     Storage storage("storage.csv");
     storage.removeCode("1000001");
@@ -28,8 +25,6 @@ int main(int argc, char** argv)
 
     storage.itemStore("1000002", 20);
     storage.printDatabase();
-    
-    fs.close();
     
     return 0;
 }
