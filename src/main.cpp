@@ -7,7 +7,7 @@ const int FRESH_FOOD_COLUMM = 7;
 int main(int argc, char** argv)
 {
     Storage storage("storage.csv");
-    bool isPeak = false; // 피크타임 여부 체크하는 변수
+    bool isPeak = true; // 피크타임 여부 체크하는 변수
     storage.printDatabase();
     bool flag = true;
     int menu;
@@ -76,6 +76,7 @@ int main(int argc, char** argv)
                     break;
                 }
                 storage.itemSold(sellItemCode, sellQnt);
+                storage.printDatabase();
                 break;
             }
             case 2:
@@ -97,7 +98,7 @@ int main(int argc, char** argv)
                 cin >> curStandQnt;
                 cout << "Max Qunatity of Stand: ";
                 cin >> maxStandQnt;
-                cout << "Qunatity in Storage";
+                cout << "Qunatity in Storage: ";
                 cin >> qntStorage;
 
                 vector<string> newItem;
@@ -107,6 +108,9 @@ int main(int argc, char** argv)
                 newItem.push_back(curStandQnt);
                 newItem.push_back(maxStandQnt);
                 newItem.push_back(qntStorage);
+
+                storage.addLine(newItem);
+                storage.printDatabase();
                 break;
             }
             case 3:
