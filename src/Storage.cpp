@@ -10,7 +10,6 @@ Storage::Storage(string filename)
     this->storage_name = filename;
     this->fs.open(filename, ios::in);
     
-    getline(this->fs, str_buf,'\n'); // 목록 부분을 제외하기 위해 한 줄을 받기만 하는 작업
     while(!fs.eof())
     {
         vector<string> tmp; // 파일을 읽기 위한 임시 벡터, 한 줄을 저장
@@ -64,8 +63,10 @@ Storage::~Storage()
         outfile << this->database[i].name << ","; 
         outfile << this->database[i].stand << ","; 
         outfile << this->database[i].cur_stand_qnt << ","; 
-        outfile << this->database[i].max_stand_qnt << ","; 
-        outfile << this->database[i].inventory << endl;
+        outfile << this->database[i].max_stand_qnt << ",";
+        outfile << this->database[i].inventory ;
+        if(i != this->database.size() - 1)
+            outfile << endl;
     }
 }
 
@@ -182,6 +183,7 @@ void Storage::ItemStore(string code, int qnt)
 
 void Storage::PrintDatabase()
 {
+    cout << "         code                      name         stand" << endl;
     for(item i : this->database)
     {
         cout.width(13);
