@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 {
     Storage storage("storage.csv");
     bool isPeak = true; // 피크타임 여부 체크하는 변수
-    storage.printDatabase();
+    storage.PrintDatabase();
     bool flag = true;
     int menu;
     while(flag)
@@ -19,11 +19,11 @@ int main(int argc, char** argv)
         else
             cout << "Peaktime = false" << endl;
 
-        for(int i = 0; i < storage.size(); i++)
+        for(int i = 0; i < storage.GetSize(); i++)
         {
             // line번째 아이템들의 값을 저장
             // 추후 각 아이템의 정보를 vector<string>으로 저장하는 것이 아닌 구조체를 만들어 저장하는 것으로 class 정의 업데이트 예정
-            Item item = storage.getItem(i);
+            Item item = storage.GetItem(i);
             int cur_stand_qnt =  item.cur_stand_qnt;
             int max_stand_qnt = item.max_stand_qnt;
             int storage_qnt = item.inventory;
@@ -59,28 +59,37 @@ int main(int argc, char** argv)
             }
         }
         // 메뉴 선택
-        cout << "1. Sell item  2. Add item  3. Save and Exit" << endl;
+        cout << "1. Sell item  2. New item  3. Place item on stand  4. Add item in storage " << endl;
+        cout << "5. Remove item 6. Save and Exit" << endl;
+
         cin >> menu;
         switch(menu){
-            case 1:
-            {
-                string sellItemCode;
-                int sellQnt;
+            case 1: // Sell item
+            {   
+                // 판매할 상품 code와 수량 입력
+                string sell_item_code;
+                int sell_qnt;
                 cout << "Item Code: ";
-                cin >> sellItemCode;
+                cin >> sell_item_code;
                 cout << "Quantity: ";
-                cin >> sellQnt;
-                if(storage.getItem(sellItemCode).cur_stand_qnt < sellQnt)
+                cin >> sell_qnt;
+
+                // 해당 상품 code로 검색해서 없을 경우 에러 메시지 출력 후 break
+                Item item = storage.GetItem(sell_item_code); // 검색되지 않았을 경우 오류 메시지 출력
+                // 상품이 검색되지 않았을 경우 반환받은 객체 검사
+                if(item.was_found == false)
                 {
-                    cout << "Wrong quantity!";
                     break;
                 }
-                storage.itemSold(sellItemCode, sellQnt);
-                storage.printDatabase();
+
+                // 상품 판매 처리
+                storage.ItemSold(sell_item_code, sell_qnt);
+                storage.PrintDatabase();
                 break;
             }
-            case 2:
+            case 2: // New item
             {
+                // 상품 정보 입력
                 string item_code;
                 string item_name;
                 string stand;
@@ -101,20 +110,65 @@ int main(int argc, char** argv)
                 cout << "Qunatity in Storage: ";
                 cin >> inventory;
 
+                // 새로운 상품 storage에 추가
                 Item newItem;
                 newItem.code = item_code;
                 newItem.name = item_name;
                 newItem.stand = stand;
                 newItem.cur_stand_qnt = stoi(cur_stand_qnt);
-                newItem.cur_stand_qnt = stoi(max_stand_qnt);
+                newItem.max_stand_qnt = stoi(max_stand_qnt);
                 newItem.inventory = stoi(inventory);
 
-                storage.addLine(newItem);
-                storage.printDatabase();
+                storage.AddLine(newItem);
+                storage.PrintDatabase();
                 break;
             }
-            case 3:
+            case 3: // Place item on stand
             {
+                // 상품 코드, 수량 입력
+                string item_code;
+                string qnt;
+
+                cout << "Item Code: ";
+                cin >> item_code;
+                cout << "Quantity: ";
+                cin >> qnt;
+                
+                // 상품 진열 처리
+                storage.ItemToStand(item_code, stoi(qnt));
+                storage.PrintDatabase();
+                break;
+            }
+            case 4: // Add item in storage
+            {
+                // 상품 코드, 수량 입력
+                string item_code;
+                string qnt;
+
+                cout << "Item Code: ";
+                cin >> item_code;
+                cout << "Quantity: ";
+                cin >> qnt;
+
+                // 재고 추가 처리
+                storage.ItemStore(item_code, stoi(qnt));
+                storage.PrintDatabase();
+                break;
+            }
+            case 5: // Remove item
+            {
+                string item_code;
+                cout << "Item Code: ";
+                cin >> item_code;
+
+                // 상품 삭제 처리
+                storage.RemoveItem(item_code);
+                storage.PrintDatabase();
+                break;
+            }
+            case 6:
+            {
+                // flag를 false로 바꿔 무한 반복문 탈출
                 flag = false;
                 break;
             }

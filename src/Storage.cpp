@@ -36,9 +36,10 @@ Storage::Storage(string filename)
         data_extracted.cur_stand_qnt = stoi(tmp[3]);
         data_extracted.max_stand_qnt = stoi(tmp[4]);
         data_extracted.inventory = stoi(tmp[5]);
+        data_extracted.was_found = true;
 
         // 추출한 Item을 database에 저장한다
-        addLine(data_extracted);
+        AddLine(data_extracted);
     }
 }
 
@@ -49,7 +50,7 @@ Storage::Storage(const Storage &other)
     // 복사할 Storage 객체의 database에 기존의 database 복사
     for(Item i : other.database)
     {
-        addLine(i);
+        AddLine(i);
     }
 }
 
@@ -68,7 +69,7 @@ Storage::~Storage()
     }
 }
 
-Item Storage::getItem(string code) const
+Item Storage::GetItem(string code) const
 {  
     // code로 해당 item 검색
     for(Item i : this->database)
@@ -79,24 +80,28 @@ Item Storage::getItem(string code) const
         }
     }
     cout << "Wrong item code" << endl; // 검색되지 않았을 경우 에러 메시지
+    // 검색되지 않을 경우에 반환하는 was_found 값이 false인 NULL 구조체
+    Item null_item;
+    null_item.was_found = false;
+    return null_item;
 }
 
-Item Storage::getItem(int line) const
+Item Storage::GetItem(int line) const
 {
     return this->database[line]; // line번째 Item 반환
 }
 
-int Storage::size() const
+int Storage::GetSize() const
 {
     return this->database.size(); // database의 목록부분을 제외한 사이즈
 }
 
-void Storage::addLine(Item new_line)
+void Storage::AddLine(Item new_line)
 {
     this->database.push_back(new_line); // database에 item 추가
 }
 
-void Storage::removeItem(string code)
+void Storage::RemoveItem(string code)
 {
     // code로 해당 item 검색
     for(int i = 0; i < this->database.size(); i++)
@@ -112,7 +117,7 @@ void Storage::removeItem(string code)
     cout << "There is no item that has code " << code << endl;
 }
 
-void Storage::itemSold(string code, int qnt)
+void Storage::ItemSold(string code, int qnt)
 {
     // code로 해당 item 검색
     for(int i = 0; i < this->database.size(); i++)
@@ -136,7 +141,7 @@ void Storage::itemSold(string code, int qnt)
     }
 }
 
-void Storage::itemToStand(string code, int qnt)
+void Storage::ItemToStand(string code, int qnt)
 {
     // code로 해당 item 검색
     for(int i = 0; i < this->database.size(); i++)
@@ -163,7 +168,7 @@ void Storage::itemToStand(string code, int qnt)
     }
 }
 
-void Storage::itemStore(string code, int qnt)
+void Storage::ItemStore(string code, int qnt)
 {
     // code로 해당 item 검색
     for(int i = 0; i < this->database.size(); i++)
@@ -175,7 +180,7 @@ void Storage::itemStore(string code, int qnt)
     }
 }
 
-void Storage::printDatabase()
+void Storage::PrintDatabase()
 {
     for(item i : this->database)
     {
