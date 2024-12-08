@@ -6,13 +6,13 @@ using namespace std;
 
 struct item
 {
-    string code;
-    string name;
-    string stand;
-    int cur_stand_qnt;
-    int max_stand_qnt;
-    int inventory;
-    bool was_found;
+    string code; // 상품 코드
+    string name; // 상품명
+    string stand; // 상품이 진열될 매대
+    int cur_stand_qnt; // 매대에 진열된 개수
+    int max_stand_qnt; // 최대 진열 가능 개수
+    int inventory; // 재고
+    bool was_found; // 기본적으로 true, 상품이 검색되지 않았을 때 이 값이 false인 구조체 반환
 } typedef Item;
 
 // 데이터 저장공간 클래스

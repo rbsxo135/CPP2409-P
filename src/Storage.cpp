@@ -40,6 +40,7 @@ Storage::Storage(string filename)
         // 추출한 Item을 database에 저장한다
         AddLine(data_extracted);
     }
+    fs.close();
 }
 
 Storage::Storage(const Storage &other)
@@ -68,6 +69,7 @@ Storage::~Storage()
         if(i != this->database.size() - 1)
             outfile << endl;
     }
+    outfile.close();
 }
 
 Item Storage::GetItem(string code) const

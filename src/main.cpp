@@ -1,4 +1,6 @@
 #include "Storage.cpp"
+#include "PeakTime.cpp"
+#include <time.h>
 using namespace std;
 
 const int STORAGE_COLUMM = 6;
@@ -6,13 +8,17 @@ const int FRESH_FOOD_COLUMM = 7;
 
 int main(int argc, char** argv)
 {
+    PeakTime pt;
+    pt.ModelUpdate(LEARNING_RATE, EPOCH);
+    
     Storage storage("storage.csv");
-    bool isPeak = true; // 피크타임 여부 체크하는 변수
+    bool isPeak = false; // 피크타임 여부 체크하는 변수
     storage.PrintDatabase();
     bool flag = true;
     int menu;
     while(flag)
     {
+        cout << "---------------------------------------------------------------------------" << endl;
         cout << "Item to display on the stand" << endl;
         if(isPeak == true)
             cout << "Peaktime = true" << endl;
@@ -58,9 +64,17 @@ int main(int argc, char** argv)
                 }
             }
         }
+
+        cout << "---------------------------------------------------------------------------" << endl;
+        // 현재 시각 표시해주기
+        time_t raw_time = time(NULL);
+        struct tm* time_info = localtime(&raw_time); // 현재 시간정보를 가지고 있는 time_info 구조체 생성
+        cout << "Current Time: " << time_info->tm_hour << "h " << time_info->tm_min << "m" << endl; // 현재 시각 출력
+        cout << "After " << time_info->tm_hour + 1 << ":00, Update Peaktime" << endl; // 수동 업데이트 해야 할 시각 알려주기
+
         // 메뉴 선택
         cout << "1. Sell item  2. New item  3. Place item on stand  4. Add item in storage " << endl;
-        cout << "5. Remove item 6. Save and Exit" << endl;
+        cout << "5. Remove item 6. Save and Exit 7. Update Peaktime" << endl;
 
         cin >> menu;
         switch(menu){
@@ -171,6 +185,13 @@ int main(int argc, char** argv)
                 // flag를 false로 바꿔 무한 반복문 탈출
                 flag = false;
                 break;
+            }
+            case 7:
+            {
+                int customer_num; // 이전 시간대 손님 수
+                cout << "Number of customers in previous time: ";
+                cin >> customer_num; // 손님 수 입력
+                isPeak = pt.Predict(customer_num); // 손님 수를 바탕으로 모델을 통해 이전 시간대가 피크타임이었는지 예측
             }
         }
         

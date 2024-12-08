@@ -6,6 +6,7 @@
         "iosfwd": "cpp",
         "ostream": "cpp",
         "deque": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "random": "cpp"
     }
 }
