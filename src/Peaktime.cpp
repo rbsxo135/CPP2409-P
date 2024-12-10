@@ -107,5 +107,5 @@ void PeakTime::ModelUpdate(double learning_rate, int epoch)
 
 bool PeakTime::Predict(int prev_sales_vol)
 {
-    return (Sigmoid(this->w * prev_sales_vol + this->b) < 0.5) ? false : true; // 이전 시간대가 피크 타임이었을 경우 true 아닐 경우 false 반ghks
+    return (Sigmoid(this->w * prev_sales_vol + this->b) < 0.5) ? false : true; // 이전 시간대가 피크 타임이었을 경우 true 아닐 경우 false 반환
 }
