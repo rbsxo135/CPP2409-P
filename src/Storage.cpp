@@ -206,9 +206,43 @@ void Storage::Close()
 
 /*********************************************************************************************************************************** */
 
+bool StorageRef::Cmp(Item &item1, Item &item2)
+{
+    if(item1.item_length == item2.item_length)
+        return item1.item_length < item2.item_length;
+    else   
+        return item1.item_length < item2.item_length;
+}
+
 /*
     StorageRef 클래스
 */
+
+void StorageRef::Combination(vector<Item> arr, vector<Item> comb, vector<vector<Item>> &result, int r, int index, int depth)
+{
+    if (r == 0)
+    {
+        vector<Item> tmp;
+        for(Item i : comb)
+        {   
+            tmp.push_back(i);
+        }
+        result.push_back(tmp);
+    }
+    else if (depth == arr.size())  // depth == n // 계속 안뽑다가 r 개를 채우지 못한 경우는 이 곳에 걸려야 한다.
+    {
+        return;
+    }
+    else
+    {
+        // arr[depth] 를 뽑은 경우
+        comb[index] = arr[depth];
+        Combination(arr, comb, result, r - 1, index + 1, depth + 1);
+        
+        // arr[depth] 를 뽑지 않은 경우
+        Combination(arr, comb, result, r, index, depth + 1);
+    }
+}
 
 // 냉장식품 Storage는 기본 Storage와 자료의 형태가 다르므로 함수를 재정의하여 형식에 맞게 읽을 수 있도록 한다
 void StorageRef::Open(string filename)
@@ -243,7 +277,18 @@ void StorageRef::Open(string filename)
             data_extracted.name = tmp[0];
             data_extracted.max_stand_qnt = stoi(tmp[1]);
             data_extracted.stand_length = stod(tmp[2]);
-            data_extracted.stand_type = tmp[3];
+            if(tmp[3] == "Fix")
+            {
+                data_extracted.stand_type = Fix;
+            } 
+            else if(tmp[3] == "Oneline")
+            {
+                data_extracted.stand_type = Oneline;
+            }
+            else
+            {
+                data_extracted.stand_type = Free;
+            }
             data_extracted.was_found = true;
 
             this->stands.push_back(data_extracted); // Stand 구조체 동적 배열에 저장
@@ -297,6 +342,7 @@ void StorageRef::AddLine(string name, Item new_line)
 {
     Stand* tmp;
     bool was_found = false;
+
     // name으로 stand 검색
     for(Stand &s : this->stands)
     {
@@ -306,9 +352,15 @@ void StorageRef::AddLine(string name, Item new_line)
             was_found = true;
         }
     }
-    if(was_found == false)
+    if(was_found == false) // 찾지 못 한 경우 함수 종료
         return;
 
+    // 정해진 종류에 맞게 등록해야 하는데 그러지 않은 경우 에러 발생
+    if(tmp->stand_type != Free && tmp->item_type != new_line.stand)
+    {
+        cout << "Type is not matching!" << endl; 
+        return;
+    }
     tmp->database.push_back(new_line);
 }
 
@@ -357,9 +409,122 @@ void StorageRef::PrintDatabase()
     for(Stand s : stands)
     {   
         cout << "Stand: " << s.name << endl;
+        cout << "Type: " << s.stand_type << endl;
         this->database = s.database; // 현재 database에 매대의 database 임시 할당
         Storage::PrintDatabase(); // 부모 함수 재사용
     }
+}
+
+void StorageRef::NewStand(Stand new_stand)
+{
+    this->stands.push_back(new_stand);
+}
+
+void StorageRef::RemoveStand(string name)
+{
+    for(int i = 0; i < this->stands.size(); i++)
+    {  
+        // 검색되었을 경우 해당 stand 삭제
+        if(this->stands[i].name == name)
+        {
+            this->stands.erase(this->stands.begin() + i);
+            return;
+        }
+    }
+}
+
+vector<Item> StorageRef::UpdateItemList()
+{
+    vector<Item> result;
+    vector<string> code_list; // 진열 필요한 상품 목록
+    vector<string> qnt_list; // 진열 개수
+
+    for (Stand s: this->stands)
+    {
+        StandType type = s.stand_type;
+        switch(type)
+        {
+            case(Fix):
+            case(Free):
+            {
+                double stand_length = s.stand_length;
+                double cur_length = 0;
+                vector<Item> zero_item; // 현재 매대에 진열된 상품이 없는 상품의 코드 리스트
+                vector<vector<Item>> comb_zero_item; // zero_item의 값들의 조합 결과, nC1, nC2...nCn 저장장
+                
+                // database에 저장된 item의 현황 파악
+                for(Item i : s.database)
+                {
+                    // 현재 매대에 진열된 상품이 있을 경우 공간을 어느정도 차지하는 지 합산
+                    if (i.cur_stand_qnt > 0)
+                    {
+                        cur_length += i.item_length;
+                    }
+                    // 현재 매대에 진열된 상품이 없을 경우 해당 아이템 코드를 리스트에 저장
+                    else if(i.inventory > 0)
+                    {
+                        zero_item.push_back(i);
+                    }
+                }
+                
+                // 
+                if(zero_item.size() > 0)
+                {
+                    for(int r = 1; r <= zero_item.size(); r++)
+                    {
+                        vector<Item> comb(r); // 조합 계산을 위한 임시 벡터, 크기 r
+                        Combination(zero_item, comb, comb_zero_item, r, 0, 0);
+                    }
+                }
+                
+                // 각 조합으로부터 조합내의 상품의 길이의 합이 냉장 매대의 빈 공간보다 작은 합중 최대 합을 가진 조합 선별
+                double max_sum = 0;
+                vector<Item> result_comb;
+                for(vector<Item> v : comb_zero_item)
+                {  
+                    double tmp_sum = 0;
+                    for(Item i : v)
+                    {
+                        tmp_sum += i.item_length;
+                    }
+                    if(tmp_sum < stand_length - cur_length && tmp_sum > max_sum)
+                    {
+                        max_sum = tmp_sum;
+                        result_comb = v;
+                    }
+                }
+
+                // 최적 조합내의 상품의 코드와 진열해야 하는 갯수 저장
+                for(Item i : result_comb)
+                {
+                    result.push_back(i);
+                    break;
+                }
+            }
+            case(Oneline):
+            {
+                int cur_stand; // 현재 Oneline 매대에 있는 상품의 총 개수
+                for(Item i : s.database)
+                {
+                    cur_stand += i.cur_stand_qnt;
+                }
+                vector<Item> zero_item; // 현재 매대에 진열된 상품이 없는 상품의 코드 리스트
+                for(Item i : s.database)
+                {
+                    if(i.cur_stand_qnt == 0)
+                    {
+                        zero_item.push_back(i);
+                    }
+                    if(zero_item.size() == s.max_stand_qnt  - cur_stand) // Oneline 매대에 최대로 넣을 수 있는 수량을 선정했을 경우 반복문 종료료
+                        break;
+                }
+                for(Item i : zero_item)
+                    result.push_back(i);
+                break;
+            }
+        }
+    }
+    return result;
 }
 
 void StorageRef::Close()

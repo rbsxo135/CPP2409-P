@@ -3,9 +3,6 @@
 #include <time.h>
 using namespace std;
 
-const int STORAGE_COLUMM = 6;
-const int FRESH_FOOD_COLUMM = 7;
-
 int main(int argc, char** argv)
 {
     PeakTime pt;
@@ -74,6 +71,19 @@ int main(int argc, char** argv)
                 }
             }
         }
+        vector<Item> ref_update_list = storage_ref.UpdateItemList();
+        
+        for(Item i : ref_update_list)
+        {
+            cout.width(13);
+            cout << std::right << i.code;
+            cout.width(25);
+            if(i.inventory % i.max_stand_qnt == 0)
+                cout << std::right << i.name << " ---> " << i.max_stand_qnt << endl;
+            else  
+                cout << std::right << i.name << " ---> " << i.inventory % i.max_stand_qnt << endl;
+        }
+        
         cout << "---------------------------------------------------------------------------" << endl;
 
         // 현재 시각 표시해주기

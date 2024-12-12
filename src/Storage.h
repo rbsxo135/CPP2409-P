@@ -2,7 +2,15 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <algorithm>
 using namespace std;
+
+enum StandType
+{
+    Fix,
+    Free, 
+    Oneline
+}; // 냉장 매대 타입
 
 // 상품 구조체
 struct item
@@ -23,7 +31,7 @@ struct stand
     string name; // 매대 이름
     int max_stand_qnt; // 세로로 최대 진열 개수
     double stand_length; // 매대의 길이
-    string stand_type; // 매대의 타입, Fix, Free, Oneline이 있다
+    StandType stand_type; // 매대의 타입, Fix, Free, Oneline이 있다
     string item_type; // 진열될 상품의 타입, Free 매대의 경우 Free
     vector<Item> database; // 매대에 등록된 상품들의 동적 배열
     bool was_found; // 기본적으로 true, 매대가 검색되지 않았을 때 이 값이 false인 구조체 반환
@@ -60,6 +68,9 @@ class StorageRef : public Storage
 {
 protected:
     vector<Stand> stands; // 매대를 저장하는 동적 배열
+    bool Cmp(Item& item1, Item& item2); // 벡터 정렬을 위한 정렬함수
+    // nCr계산 함수, n크기의 피추출 집단, r크기의 임시 벡터, 결과 저장 벡터, r값, 재귀함수의 초기값(index=0,depth=0으로 세팅팅)
+    void Combination(vector<Item> arr, vector<Item> comb, vector<vector<Item>>& result, int r, int index, int depth);
 public:
     void Open(string filename); // 파일 여는 함수 재정의
 
@@ -73,5 +84,9 @@ public:
     void ItemStore(string code, int qnt);
     void PrintDatabase();
     
+    void NewStand(Stand new_stand); // stnad 추가
+    void RemoveStand(string name); // stand 삭제
+    vector<Item> UpdateItemList(); // 냉장 매대에 채워 넣어야 할 상품 목록 생성 및 반환
+
     void Close(); // 파일 저장 함수 재정의
 };
