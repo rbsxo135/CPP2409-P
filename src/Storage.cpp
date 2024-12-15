@@ -177,11 +177,7 @@ void Storage::PrintDatabase()
         cout << right << i.name << " ";
         cout. width(13);
         cout << right << i.stand << "  " << i.cur_stand_qnt << "/" 
-                << i.max_stand_qnt << "/" << i.inventory;
-        if(i.item_length > 0) // 냉장 식품 매대일 경우 item_length가 0보다 크다
-            cout << "  " << i.item_length << endl;
-        else // 아닐 경우는 일반 매대
-            cout << endl;
+                << i.max_stand_qnt << "/" << i.inventory << endl;
     }
 }
 
@@ -206,13 +202,6 @@ void Storage::Close()
 
 /*********************************************************************************************************************************** */
 
-bool StorageRef::Cmp(Item &item1, Item &item2)
-{
-    if(item1.item_length == item2.item_length)
-        return item1.item_length < item2.item_length;
-    else   
-        return item1.item_length < item2.item_length;
-}
 
 /*
     StorageRef 클래스
@@ -356,7 +345,7 @@ void StorageRef::AddLine(string name, Item new_line)
         return;
 
     // 정해진 종류에 맞게 등록해야 하는데 그러지 않은 경우 에러 발생
-    if(tmp->stand_type != Free && tmp->item_type != new_line.stand)
+    if(tmp->stand_type != Free && !tmp->item_type.compare(new_line.stand))
     {
         cout << "Type is not matching!" << endl; 
         return;
@@ -409,7 +398,13 @@ void StorageRef::PrintDatabase()
     for(Stand s : stands)
     {   
         cout << "Stand: " << s.name << endl;
-        cout << "Type: " << s.stand_type << endl;
+        cout << "Type: ";
+            if(s.stand_type == Fix)
+                cout << "Fix" << endl;
+            else if(s.stand_type == Free)
+                cout << "Free" << endl;
+            else  
+                cout << "Oneline" << endl;
         this->database = s.database; // 현재 database에 매대의 database 임시 할당
         Storage::PrintDatabase(); // 부모 함수 재사용
     }

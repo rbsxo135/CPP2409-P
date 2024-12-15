@@ -11,7 +11,7 @@ double PeakTime::Sigmoid(double z)
 void PeakTime::GradientDescent(vector<int>& X, vector<double>& Y, double & w, double& b, double learning_rate)
 {  
     const int m = X.size(); // 벡터 데이터의 사이즈, X, Y사이즈가 동일
-    double loss = 0, dw = 0, db = 0;
+    double dw = 0, db = 0;
 
     // cost function, dw, db값 계산
     for(int i = 0; i < m; i++)
@@ -32,16 +32,6 @@ void PeakTime::ModelUpdate(double learning_rate, int epoch)
     // 파일 읽고 쓰기 위한 fstream 객체, 문자열 버퍼 생성
     ifstream ifs;
     string str_buf;
-
-    ifs.open("param.csv", ios::in); // 파라미터 저장된 csv 파일 읽기 모드로 오픈
-
-    // w, b값 가져오기
-    getline(ifs, str_buf, ',');
-    this->w = stod(str_buf);
-    getline(ifs, str_buf);
-    this->b = stod(str_buf);
-
-    ifs.close(); // 파일 종료
 
     vector<vector<int>> X; // 각 시간대별 판매량이 저장된 X 벡터
     vector<vector<double>> Y; // 각 시간대별 피크타임 여부가 저장될 12*n Y 행렬
@@ -107,5 +97,6 @@ void PeakTime::ModelUpdate(double learning_rate, int epoch)
 
 bool PeakTime::Predict(int prev_sales_vol)
 {
-    return (Sigmoid(this->w * prev_sales_vol + this->b) < 0.5) ? false : true; // 이전 시간대가 피크 타임이었을 경우 true 아닐 경우 false 반환
+    // 이전 시간대가 피크 타임이었을 경우 true 아닐 경우 false 반환
+    return (Sigmoid(this->w * prev_sales_vol + this->b) < 0.5) ? false : true;
 }

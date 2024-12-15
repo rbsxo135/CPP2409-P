@@ -2,7 +2,6 @@
 #include <vector>
 #include <fstream>
 #include <string>
-#include <algorithm>
 using namespace std;
 
 enum StandType
@@ -68,9 +67,10 @@ class StorageRef : public Storage
 {
 protected:
     vector<Stand> stands; // 매대를 저장하는 동적 배열
-    bool Cmp(Item& item1, Item& item2); // 벡터 정렬을 위한 정렬함수
-    // nCr계산 함수, n크기의 피추출 집단, r크기의 임시 벡터, 결과 저장 벡터, r값, 재귀함수의 초기값(index=0,depth=0으로 세팅팅)
-    void Combination(vector<Item> arr, vector<Item> comb, vector<vector<Item>>& result, int r, int index, int depth);
+    // nCr계산 함수, n크기의 피추출 집단, r크기의 임시 벡터, 결과 저장 벡터, r값, 
+    // 재귀함수의 초기값(index=0,depth=0으로 세팅)
+    void Combination(vector<Item> arr, vector<Item> comb, vector<vector<Item>>& result, 
+            int r, int index, int depth);
 public:
     void Open(string filename); // 파일 여는 함수 재정의
 
